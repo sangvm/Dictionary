@@ -7,6 +7,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.dictionary.model.Word;
 import com.example.dictionary.ui.detail.DetailFragment;
 import com.example.dictionary.ui.home.HomeFragment;
 import com.google.android.material.navigation.NavigationView;
@@ -32,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText editText;
     private ActivityMainBinding binding;
 
+    private DBHelper dbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,11 +54,15 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        dbHelper = new DBHelper(this);
+
         fragmentManager = getSupportFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.nav_host_fragment_content_main, new HomeFragment());
         fragmentTransaction.commit();
         editText = findViewById(R.id.search_text);
+
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
@@ -63,9 +70,13 @@ public class MainActivity extends AppCompatActivity {
                     // Lấy giá trị từ EditText
                     String searchResult = editText.getText().toString();
                     System.out.println("search text ở home" + searchResult);
+
+                    Word word = dbHelper.getWord(searchResult, "en_en");
+
                     // Tạo bundle để chứa giá trị searchResult
                     Bundle bundle = new Bundle();
-                    bundle.putString("search_result", searchResult);
+                    //bundle.putString("search_result", searchResult);
+                    bundle.putString("search_result", word.value);
 
                     // Tạo instance của DetailFragment và truyền bundle vào
                     detailFragment = new DetailFragment();
