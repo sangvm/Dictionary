@@ -3,15 +3,19 @@ package com.example.dictionary;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.dictionary.model.Word;
+import com.example.dictionary.ui.bookmark.BookmarkFragment;
 import com.example.dictionary.ui.detail.DetailFragment;
 import com.example.dictionary.ui.home.HomeFragment;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.annotation.NonNull;
+import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -24,7 +28,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dictionary.databinding.ActivityMainBinding;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private AppBarConfiguration mAppBarConfiguration;
     private FragmentManager fragmentManager;
@@ -48,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home)
+                R.id.nav_home, R.id.nav_bookmark)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
@@ -57,10 +61,10 @@ public class MainActivity extends AppCompatActivity {
 
         dbHelper = new DBHelper(this);
 
-        fragmentManager = getSupportFragmentManager();
-        fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.nav_host_fragment_content_main, new HomeFragment());
-        fragmentTransaction.commit();
+//        fragmentManager = getSupportFragmentManager();
+//        fragmentTransaction = fragmentManager.beginTransaction();
+//        fragmentTransaction.add(R.id.nav_host_fragment_content_main, new HomeFragment());
+//        fragmentTransaction.commit();
         editText = findViewById(R.id.search_text);
 
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -106,5 +110,22 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        System.out.println("ID---------------------------     " + id);
+        if (id == R.id.nav_home) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_content_main,
+                    new HomeFragment()).commit();
+        } else if (id == R.id.nav_bookmark) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_content_main,
+                    new BookmarkFragment()).commit();
+        }
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }
