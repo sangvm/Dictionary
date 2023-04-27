@@ -1,5 +1,6 @@
 package com.example.dictionary;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -73,24 +74,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     // Lấy giá trị từ EditText
                     String searchResult = editText.getText().toString();
-                    System.out.println("search text ở home" + searchResult);
-
+                    if (searchResult.length() == 0) return false;
                     Word word = dbHelper.getWord(searchResult, "en_en");
 
-                    // Tạo bundle để chứa giá trị searchResult
-                    Bundle bundle = new Bundle();
-                    //bundle.putString("search_result", searchResult);
-                    bundle.putString("search_result", word.value);
+                    Intent intent = new Intent(MainActivity.this, DetailActivity.class);;
+                    intent.putExtra("search_text", word.key);
+                    intent.putExtra("search_result", word.value);
 
-                    // Tạo instance của DetailFragment và truyền bundle vào
-                    detailFragment = new DetailFragment();
-                    detailFragment.setArguments(bundle);
-
-                    // Thay thế fragment hiện tại bằng DetailFragment
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.nav_host_fragment_content_main, detailFragment)
-                            .addToBackStack(null)
-                            .commit();
+                    startActivity(intent);
                     return true;
                 }
                 return false;

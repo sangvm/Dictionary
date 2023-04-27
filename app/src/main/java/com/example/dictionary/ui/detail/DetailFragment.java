@@ -32,8 +32,8 @@ public class DetailFragment extends Fragment {
         Bundle bundle = getArguments();
         String searchResult = bundle.getString("search_result");
         System.out.println("SEARCH " + searchResult);
-        detailTextView = view.findViewById(R.id.detail_text);
-        detailTextView.setText(searchResult);
+//        detailTextView = view.findViewById(R.id.detail_text);
+//        detailTextView.setText(searchResult);
         return view;
     }
 
