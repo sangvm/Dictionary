@@ -10,16 +10,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.example.dictionary.model.Word;
-import com.example.dictionary.ui.bookmark.BookmarkFragment;
-import com.example.dictionary.ui.detail.DetailFragment;
 import com.example.dictionary.ui.home.HomeFragment;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.GravityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -32,9 +27,7 @@ import com.example.dictionary.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private AppBarConfiguration mAppBarConfiguration;
-    private FragmentManager fragmentManager;
-    private FragmentTransaction fragmentTransaction;
-    private DetailFragment detailFragment;
+
     private EditText editText;
     private ActivityMainBinding binding;
 
@@ -50,36 +43,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(binding.appBarMain.toolbar);
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
         mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_bookmark)
+                R.id.nav_home)
                 .setOpenableLayout(drawer)
                 .build();
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        MenuItem bookmarkItem = navigationView.getMenu().findItem(R.id.nav_bookmark);
+        bookmarkItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(MainActivity.this, BookmarkActivity.class);
+                startActivity(intent);
+                return false;
+            }
+        });
+
         dbHelper = new DBHelper(this);
 
-//        fragmentManager = getSupportFragmentManager();
-//        fragmentTransaction = fragmentManager.beginTransaction();
-//        fragmentTransaction.add(R.id.nav_host_fragment_content_main, new HomeFragment());
-//        fragmentTransaction.commit();
         editText = findViewById(R.id.search_text);
 
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    // Lấy giá trị từ EditText
                     String searchResult = editText.getText().toString();
                     if (searchResult.length() == 0) return false;
-                    Word word = dbHelper.getWord(searchResult, "en_en");
 
                     Intent intent = new Intent(MainActivity.this, DetailActivity.class);;
-                    intent.putExtra("search_text", word.key);
-                    intent.putExtra("search_result", word.value);
+                    intent.putExtra("search_text", searchResult);
 
                     startActivity(intent);
                     return true;
@@ -105,18 +100,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        System.out.println("ID---------------------------     " + id);
-        if (id == R.id.nav_home) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_content_main,
-                    new HomeFragment()).commit();
-        } else if (id == R.id.nav_bookmark) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.nav_host_fragment_content_main,
-                    new BookmarkFragment()).commit();
-        }
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 }

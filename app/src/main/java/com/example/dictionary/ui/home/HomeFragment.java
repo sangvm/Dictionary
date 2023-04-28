@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.dictionary.databinding.FragmentHomeBinding;
-import com.example.dictionary.ui.detail.DetailViewModel;
 
 public class HomeFragment extends Fragment {
 

@@ -108,8 +108,7 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
-    public ArrayList<String> getWordFromBookmark(String key) {
-        String searchText = convertWordForm(key);
+    public ArrayList<String> getWordFromBookmark() {
         String query = "SELECT * FROM bookmark";
         Cursor result = mDB.rawQuery(query, null);
 
@@ -138,8 +137,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void deleteBookmark(Word word) {
         try {
-            String query = "DELETE FROM bookmark WHERE " + COL_KEY +" = \"?\" AND " + COL_VALUE + " = \"?\"";
-            mDB.execSQL(query, new Object[] {word.key, word.value});
+            String query = "DELETE FROM bookmark WHERE word = ?";
+            mDB.execSQL(query, new String[] {word.key});
         }
         catch (Exception e) {
 
