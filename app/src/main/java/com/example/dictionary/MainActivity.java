@@ -62,6 +62,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        MenuItem paragraphItem = navigationView.getMenu().findItem(R.id.nav_paragraph);
+        paragraphItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(MainActivity.this, ParagraphTranslateActivity.class);
+                startActivity(intent);
+                return false;
+            }
+        });
+
+
         dbHelper = new DBHelper(this);
 
         editText = findViewById(R.id.search_text);

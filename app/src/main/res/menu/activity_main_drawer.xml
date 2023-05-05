@@ -12,5 +12,9 @@
             android:id="@+id/nav_bookmark"
             android:icon="@drawable/ic_menu_bookmark"
             android:title="@string/menu_bookmark" />
+        <item
+            android:id="@+id/nav_paragraph"
+            android:icon="@drawable/ic_menu_translate"
+            android:title="Dịch đoạn văn" />
     </group>
 </menu>
