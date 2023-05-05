@@ -1,35 +1,76 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:padding="10dp"
     tools:context=".ParagraphTranslateActivity">
-
-    <EditText
-        android:id="@+id/first_textbox"
+    
+    <ScrollView
+        android:layout_above="@id/optionLl"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:ems="10"
-        android:hint="Enter English text here"/>
+        android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/translate_button"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/sourceLanguage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:minHeight="100dp"
+                android:textSize="18sp">
+            </EditText>
+            <TextView
+                android:id="@+id/destinationLanguage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textSize="18sp"
+                ></TextView>
+        </LinearLayout>
+    </ScrollView>
+    
+    <LinearLayout
+        android:id="@+id/optionLl"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:text="Translate" />
+        android:orientation="horizontal"
+        android:layout_above="@id/translateBtn"
+        android:gravity="center"
+        >
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sourceLanguageChooseBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:cornerRadius="10dp"
+            android:layout_weight="1"
+            android:text="English">
+        </com.google.android.material.button.MaterialButton>
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_forward"
+            ></ImageButton>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/destinationLanguageChooseBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vietnamese"
+            android:layout_weight="1"
+            app:cornerRadius="10dp"
+            ></com.google.android.material.button.MaterialButton>
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/second_textbox"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/translateBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp"
-        />
-
-</LinearLayout>
+        android:layout_alignParentBottom="true"
+        android:text="Translate"
+        >
+    </com.google.android.material.button.MaterialButton>
+</RelativeLayout>
