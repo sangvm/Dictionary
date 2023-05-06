@@ -20,6 +20,10 @@ public class BookmarkActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bookmark);
+
+        setTitle("Danh sách yêu thích");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         dbHelper = new DBHelper(this);
         ArrayList<String> bookmarkList = dbHelper.getWordFromBookmark();
         ListView bookmarkListView = findViewById(R.id.bookmark_list_view);
