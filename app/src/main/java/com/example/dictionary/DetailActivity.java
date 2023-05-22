@@ -22,13 +22,14 @@ import android.widget.Toast;
 
 import com.example.dictionary.model.Word;
 
+import java.sql.SQLOutput;
 import java.util.Locale;
 
 public class DetailActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private TextToSpeech textToSpeech;
-
+    private String dicType;
     private DBHelper dbHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,7 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
 
         setTitle("Chi tiết");
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Intent intent = getIntent();
@@ -43,7 +45,13 @@ public class DetailActivity extends AppCompatActivity {
         dbHelper = new DBHelper(this);
         String data = intent.getStringExtra("search_text");
         drawerLayout = findViewById(R.id.detail_layout);
-        Word word = dbHelper.getWord(data, "en_en");
+
+        dicType = intent.getStringExtra("dic_type");
+        if (dicType == null) {
+            dicType = "en_en";
+        }
+
+        Word word = dbHelper.getWord(data, dicType);
 
         String searchText = word.key;
         String searchResult = word.value;

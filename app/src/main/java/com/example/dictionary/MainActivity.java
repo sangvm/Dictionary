@@ -29,7 +29,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private AppBarConfiguration mAppBarConfiguration;
 
     private EditText editText;
+    private String dicType;
     private ActivityMainBinding binding;
+
+    MenuItem menuSetting;
 
     private DBHelper dbHelper;
 
@@ -86,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     Intent intent = new Intent(MainActivity.this, DetailActivity.class);;
                     intent.putExtra("search_text", searchResult);
+                    intent.putExtra("dic_type", dicType);
 
                     startActivity(intent);
                     return true;
@@ -99,7 +103,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+        menuSetting = menu.findItem(R.id.action_setting);
+
+       String id = Global.getState(this, "dic_type");
+       if (id != null) {
+           onOptionsItemSelected(menu.findItem(Integer.valueOf(id)));
+       }
+       return true;
     }
 
     @Override
@@ -110,7 +120,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        try {
+            int id = item.getItemId();
+            if (!String.valueOf(id).equals("")) {
+                Global.saveState(this, "dic_type", String.valueOf(id));
+            }
+
+            if (id == R.id.action_en_en) {
+                dicType = "en_en";
+                menuSetting.setIcon(getDrawable(R.drawable.ic_en_en));
+            }
+            if (id == R.id.action_vn_en) {
+                dicType = "vn_en";
+                menuSetting.setIcon(getDrawable(R.drawable.ic_vn_en));
+            }
+        }
+        catch (Exception ex) {
+            dicType = "en_en";
+            menuSetting.setIcon(getDrawable(R.drawable.ic_en_en));
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+
         return true;
     }
 }
