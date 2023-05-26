@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:padding="10dp"
     tools:context=".ParagraphTranslateActivity">
-    
+
     <ScrollView
         android:layout_above="@id/optionLl"
         android:layout_width="match_parent"
@@ -33,7 +33,7 @@
                 ></TextView>
         </LinearLayout>
     </ScrollView>
-    
+
     <LinearLayout
         android:id="@+id/optionLl"
         android:layout_width="match_parent"
@@ -44,25 +44,24 @@
         >
         <com.google.android.material.button.MaterialButton
             android:id="@+id/sourceLanguageChooseBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:cornerRadius="10dp"
             android:layout_weight="1"
-            android:text="English">
-        </com.google.android.material.button.MaterialButton>
+            app:cornerRadius="10dp"
+            android:text="English"/>
+
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_forward"
-            ></ImageButton>
+            android:src="@drawable/ic_forward"/>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/destinationLanguageChooseBtn"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Vietnamese"
             android:layout_weight="1"
             app:cornerRadius="10dp"
-            ></com.google.android.material.button.MaterialButton>
+            android:text="Vietnamese"/>
     </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
