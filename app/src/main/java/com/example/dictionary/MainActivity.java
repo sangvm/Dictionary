@@ -1,13 +1,21 @@
 package com.example.dictionary;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.dictionary.model.Word;
 import com.example.dictionary.ui.home.HomeFragment;
@@ -24,6 +32,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dictionary.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -33,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ActivityMainBinding binding;
 
     MenuItem menuSetting;
+    ArrayList<String> searchHistoryList = new ArrayList<>();
 
     private DBHelper dbHelper;
 
@@ -54,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
 
         MenuItem bookmarkItem = navigationView.getMenu().findItem(R.id.nav_bookmark);
         bookmarkItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -85,16 +98,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String searchResult = editText.getText().toString();
-                    if (searchResult.length() == 0) return false;
+                    if (searchResult.length() == 0) {
+                        Toast.makeText(getApplicationContext(), "Không tìm thấy từ cần tìm!", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    Word word = dbHelper.getWord(searchResult, dicType);
+                    if (word.value.isEmpty()) {
+                        Toast.makeText(getApplicationContext(), "Không tìm thấy từ cần tìm!", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    else {
+                        Intent intent = new Intent(MainActivity.this, DetailActivity.class);;
+                        intent.putExtra("search_text", searchResult);
+                        intent.putExtra("dic_type", dicType);
 
-                    Intent intent = new Intent(MainActivity.this, DetailActivity.class);;
-                    intent.putExtra("search_text", searchResult);
-                    intent.putExtra("dic_type", dicType);
+                        startActivity(intent);
+                        return true;
+                    }
 
-                    startActivity(intent);
-                    return true;
                 }
                 return false;
+            }
+        });
+
+        searchHistoryList = dbHelper.getWordFromHistory(dicType);
+        ListView searchHistoryView = findViewById(R.id.search_history_list);
+        HomeAdapter adapter = new HomeAdapter(this, searchHistoryList);
+        searchHistoryView.setAdapter(adapter);
+        searchHistoryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedWord = (String) parent.getItemAtPosition(position);
+                String word = selectedWord.substring(0, selectedWord.indexOf("\n"));
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                intent.putExtra("search_text", word);
+                startActivity(intent);
             }
         });
     }
@@ -140,12 +178,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             dicType = "en_en";
             menuSetting.setIcon(getDrawable(R.drawable.ic_en_en));
         }
+        finally {
+            searchHistoryList = dbHelper.getWordFromHistory(dicType);
+            ListView searchHistoryView = findViewById(R.id.search_history_list);
+            HomeAdapter adapter = new HomeAdapter(this, searchHistoryList);
+            searchHistoryView.setAdapter(adapter);
+        }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-
         return true;
+    }
+}
+
+class HomeAdapter extends ArrayAdapter<String> {
+    private final int[] colors = new int[] { Color.WHITE, Color.rgb(240, 240, 240) };
+
+    public HomeAdapter(Context context, List<String> bookmarks) {
+        super(context, android.R.layout.simple_list_item_1, bookmarks);
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View view = super.getView(position, convertView, parent);
+        int color = colors[position % colors.length];
+        view.setBackgroundColor(color);
+        return view;
     }
 }

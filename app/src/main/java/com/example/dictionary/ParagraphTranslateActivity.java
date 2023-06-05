@@ -119,15 +119,13 @@ public class ParagraphTranslateActivity extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Log.d(TAG, "onSuccess: model ready, start translate");
-
+                        //Log.d(TAG, "onSuccess: model ready, start translate");
                         progressDialog.setMessage("Translating...");
-
                         translator.translate(sourceLanguageText)
                                 .addOnSuccessListener(new OnSuccessListener<String>() {
                                     @Override
                                     public void onSuccess(String translatedText) {
-                                        Log.d(TAG, "onSuccess: translatedText " + translatedText);
+                                        //Log.d(TAG, "onSuccess: translatedText " + translatedText);
                                         progressDialog.dismiss();
                                         destinationLanguageTextView.setText(translatedText);
                                     }
@@ -145,7 +143,7 @@ public class ParagraphTranslateActivity extends AppCompatActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         progressDialog.dismiss();
-                        Log.d(TAG, "onFailure: ", e);
+                        //Log.d(TAG, "onFailure: ", e);
                         Toast.makeText(ParagraphTranslateActivity.this, "Failed to ready model due to " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -156,7 +154,7 @@ public class ParagraphTranslateActivity extends AppCompatActivity {
         List<String> languageCodeList = TranslateLanguage.getAllLanguages();
         for (String languageCode : languageCodeList) {
             String languageTitle = new Locale(languageCode).getDisplayLanguage();
-            Log.d(TAG, "Load Available Language: " + languageCode);
+            //Log.d(TAG, "Load Available Language: " + languageCode);
 
             ModelLanguage modelLanguage = new ModelLanguage(languageCode, languageTitle);
             languageArrayList.add((modelLanguage));
