@@ -19,6 +19,5 @@
                 app:showAsAction="never"
                 android:title="EN-EN"></item>
         </menu>
-
     </item>
 </menu>

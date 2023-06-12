@@ -25,8 +25,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
     private Context mContext;
 
+    private static final int LIMIT_SEARCH = 12;
     public static final String DATABASE_NAME = "Dictionary.db";
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 7;
     private static final String SP_KEY_DB_VER = "db_ver";
     private String DATABASE_LOCATION = "";
     private String DATABASE_FULL_PATH = "";
@@ -181,9 +182,6 @@ public class DBHelper extends SQLiteOpenHelper {
     @SuppressLint("Range")
     public Word getWord(String key, String dictionaryType) {
         String tableName = getTableName(dictionaryType);
-//        String searchText = convertWordForm(key);
-
-        System.out.println(tableName);
         String searchText = key;
         if (tableName == en_en) searchText = convertWordForm(searchText);
         String query = "SELECT * FROM " + tableName + " WHERE [word]= ?";
@@ -199,12 +197,16 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @SuppressLint("Range")
     public ArrayList<String> getWordFromBookmark() {
-        String query = "SELECT * FROM bookmark";
+        String query = "SELECT * FROM bookmark ORDER BY last_update DESC";
         Cursor result = mDB.rawQuery(query, null);
 
         ArrayList<String> source = new ArrayList<>();
         while (result.moveToNext()) {
-            source.add(result.getString(result.getColumnIndex(COL_KEY)));
+            String data = result.getString(result.getColumnIndex(COL_KEY));
+            data += "\n";
+            String value = result.getString(result.getColumnIndex(COL_VALUE));
+            data += value.substring(0, Math.min(46, value.length())) + "...";
+            source.add(data);
         }
         return source;
     }
@@ -217,7 +219,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public void addBookmark(Word word) {
         try {
-            String query = "INSERT INTO bookmark (\"" + COL_KEY + "\", \"" + COL_VALUE + "\") VALUES (?, ?);";
+            String query = "INSERT INTO bookmark (word, definition, last_update) VALUES (?, ?, strftime('%Y-%m-%d %H:%M:%S', datetime('now')));";
             mDB.execSQL(query, new Object[] {word.key, word.value});
         }
         catch (Exception e) {
@@ -239,6 +241,7 @@ public class DBHelper extends SQLiteOpenHelper {
         String result = str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
         return result;
     }
+
     public String getTableName (String dicType) {
         String tableName = "";
         if(Objects.equals(dicType, en_en)) {
@@ -249,5 +252,67 @@ public class DBHelper extends SQLiteOpenHelper {
         }
         System.out.println("table name" + tableName);
         return tableName;
+    }
+
+    @SuppressLint("Range")
+    public ArrayList<String> getWordFromHistory(String dictionaryType) {
+        String tableName = "";
+        if (Objects.isNull(dictionaryType)) {
+            tableName = "history_en_en";
+        }
+        else {
+            switch (dictionaryType) {
+                case "en_en": {
+                    tableName = "history_en_en";
+                    break;
+                }
+                case "vn_en": {
+                    tableName = "history_vn_en";
+                    break;
+                }
+                default: {
+                    tableName = "history_en_en";
+                    break;
+                }
+            }
+        }
+
+        String query = "SELECT * FROM " + tableName + " ORDER BY last_update DESC LIMIT " + LIMIT_SEARCH;
+        Cursor result = mDB.rawQuery(query, null);
+
+        ArrayList<String> source = new ArrayList<>();
+        while (result.moveToNext()) {
+            String data = result.getString(result.getColumnIndex(COL_KEY));
+            data += "\n";
+            String value = result.getString(result.getColumnIndex(COL_VALUE));
+            data += value.substring(0, Math.min(46, value.length())) + "...";
+            source.add(data);
+        }
+        return source;
+    }
+
+    public void updateWordToHistory(Word word, String dictionaryType) {
+        String tableName = "";
+        if (Objects.isNull(dictionaryType)) {
+            tableName = "history_en_en";
+        }
+        else {
+            switch (dictionaryType) {
+                case "en_en": {
+                    tableName = "history_en_en";
+                    break;
+                }
+                case "vn_en": {
+                    tableName = "history_vn_en";
+                    break;
+                }
+                default: {
+                    tableName = "history_en_en";
+                    break;
+                }
+            }
+        }
+        String query = "INSERT OR REPLACE INTO " + tableName + " (word, definition, last_update) VALUES (?, ?, strftime('%Y-%m-%d %H:%M:%S', datetime('now')))";
+        mDB.execSQL(query, new Object[] {word.key, word.value});
     }
 }

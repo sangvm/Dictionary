@@ -61,6 +61,8 @@ public class DetailActivity extends AppCompatActivity {
 
         Word word = dbHelper.getWord(data, dicType);
 
+        dbHelper.updateWordToHistory(word, dicType);
+
         String searchText = word.key;
         String searchResult = word.value;
 
