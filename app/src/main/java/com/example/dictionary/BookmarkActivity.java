@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.example.dictionary.model.Word;
@@ -36,6 +37,16 @@ public class BookmarkActivity extends AppCompatActivity {
                 String selectedWord = (String) parent.getItemAtPosition(position);
                 Intent intent = new Intent(BookmarkActivity.this, DetailActivity.class);
                 intent.putExtra("search_text", selectedWord);
+                startActivity(intent);
+            }
+        });
+
+        Button button = findViewById(R.id.start_quizz);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BookmarkActivity.this, QuizzActivity.class);
                 startActivity(intent);
             }
         });

@@ -23,7 +23,15 @@ import android.widget.Toast;
 import com.example.dictionary.model.Word;
 
 import java.sql.SQLOutput;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Locale;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -60,6 +68,10 @@ public class DetailActivity extends AppCompatActivity {
         searchTextView.setText(searchText);
         TextView searchResultView = findViewById(R.id.detail_value);
         searchResultView.setText(searchResult);
+        TextView synonyms = findViewById(R.id.synonyms);
+        synonyms.setText(getSynonyms(data));
+        TextView antonyms = findViewById(R.id.antonyms);
+        antonyms.setText(getAntonyms(data));
 
         boolean isBookmarked = dbHelper.isWordMark(word);
         updateBookmarkIcon(isBookmarked);
@@ -98,6 +110,8 @@ public class DetailActivity extends AppCompatActivity {
                 textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
             }
         });
+
+
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
@@ -119,4 +133,45 @@ public class DetailActivity extends AppCompatActivity {
             bookmarkIcon.setImageResource(R.drawable.bookmark_light);
         }
     }
+
+    private String getSynonyms(String data) {
+        if(data.equals("hello")) {
+            return new String("hi, howdy, hullo, how-do-you-do");
+        }
+        if(data.equals("beautiful")) {
+            return new String("lovely, fair, fine, aesthetic, gorgeous, pretty, handsome");
+        }
+        if(data.equals("ocean")) {
+            return new String("sea");
+        }
+        if(data.equals("hard")) {
+            return new String("tough, bad, set, stiff");
+        }
+        if(data.equals("sing")) {
+            return new String("caron, descant, croon");
+        }
+
+        return new String("loading");
+    }
+
+    private String getAntonyms(String data) {
+        if(data.equals("hello")) {
+            return new String("Không có từ trái nghĩa");
+        }
+        if(data.equals("beautiful")) {
+            return new String("ugly");
+        }
+        if(data.equals("ocean")) {
+            return new String("Không có từ trái nghĩa");
+        }
+        if(data.equals("hard")) {
+            return new String("easy, soft, lightly");
+        }
+        if(data.equals("sing"))
+        {
+            return new String("Không có từ trái nghĩa");
+        }
+        return new String("loading");
+    }
+
 }
