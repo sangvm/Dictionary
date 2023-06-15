@@ -8,6 +8,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import android.content.Intent;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +40,7 @@ public class DetailActivity extends AppCompatActivity {
     private TextToSpeech textToSpeech;
     private String dicType;
     private DBHelper dbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,20 +58,20 @@ public class DetailActivity extends AppCompatActivity {
 
         dicType = intent.getStringExtra("dic_type");
         if (dicType == null) {
-            dicType = "en_en";
+            dicType = "en_vn";
         }
 
         Word word = dbHelper.getWord(data, dicType);
 
         dbHelper.updateWordToHistory(word, dicType);
 
-        String searchText = word.key;
-        String searchResult = word.value;
+        String searchText = word.word;
+        String searchResult = word.html;
 
         TextView searchTextView = findViewById(R.id.detail_key);
         searchTextView.setText(searchText);
         TextView searchResultView = findViewById(R.id.detail_value);
-        searchResultView.setText(searchResult);
+        searchResultView.setText(Html.fromHtml(searchResult));
         TextView synonyms = findViewById(R.id.synonyms);
         synonyms.setText(getSynonyms(data));
         TextView antonyms = findViewById(R.id.antonyms);
@@ -96,8 +98,7 @@ public class DetailActivity extends AppCompatActivity {
             public void onInit(int i) {
                 if (i != TextToSpeech.ERROR) {
                     textToSpeech.setLanguage(Locale.ENGLISH);
-                }
-                else {
+                } else {
 
                 }
             }
@@ -108,25 +109,26 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String text = searchText;
-                Toast.makeText(getApplicationContext(), text,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT).show();
                 textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null);
             }
         });
 
-
     }
 
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
         startActivityForResult(myIntent, 0);
         return true;
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+
     private void updateBookmarkIcon(boolean isBookmarked) {
         ImageView bookmarkIcon = findViewById(R.id.bookmark_icon);
         if (!isBookmarked) {
@@ -137,19 +139,19 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private String getSynonyms(String data) {
-        if(data.equals("hello")) {
+        if (data.equals("hello")) {
             return new String("hi, howdy, hullo, how-do-you-do");
         }
-        if(data.equals("beautiful")) {
+        if (data.equals("beautiful")) {
             return new String("lovely, fair, fine, aesthetic, gorgeous, pretty, handsome");
         }
-        if(data.equals("ocean")) {
+        if (data.equals("ocean")) {
             return new String("sea");
         }
-        if(data.equals("hard")) {
+        if (data.equals("hard")) {
             return new String("tough, bad, set, stiff");
         }
-        if(data.equals("sing")) {
+        if (data.equals("sing")) {
             return new String("caron, descant, croon");
         }
 
@@ -157,20 +159,19 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private String getAntonyms(String data) {
-        if(data.equals("hello")) {
+        if (data.equals("hello")) {
             return new String("Không có từ trái nghĩa");
         }
-        if(data.equals("beautiful")) {
+        if (data.equals("beautiful")) {
             return new String("ugly");
         }
-        if(data.equals("ocean")) {
+        if (data.equals("ocean")) {
             return new String("Không có từ trái nghĩa");
         }
-        if(data.equals("hard")) {
+        if (data.equals("hard")) {
             return new String("easy, soft, lightly");
         }
-        if(data.equals("sing"))
-        {
+        if (data.equals("sing")) {
             return new String("Không có từ trái nghĩa");
         }
         return new String("loading");

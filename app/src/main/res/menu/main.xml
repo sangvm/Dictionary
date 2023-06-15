@@ -14,10 +14,20 @@
                 app:showAsAction="never"
                 android:title="VN-EN"></item>
             <item
-                android:id="@+id/action_en_en"
+                android:id="@+id/action_en_vn"
+                android:orderInCategory="100"
+                android:title="EN-VN"
+                app:showAsAction="never"></item>
+            <item
+                android:id="@+id/action_vn_fr"
                 android:orderInCategory="100"
                 app:showAsAction="never"
-                android:title="EN-EN"></item>
+                android:title="VN-FR"></item>
+            <item
+                android:id="@+id/action_fr_vn"
+                android:orderInCategory="100"
+                android:title="FR-VN"
+                app:showAsAction="never"></item>
         </menu>
     </item>
 </menu>

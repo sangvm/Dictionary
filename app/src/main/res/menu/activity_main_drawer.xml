@@ -16,5 +16,9 @@
             android:id="@+id/nav_paragraph"
             android:icon="@drawable/ic_menu_translate"
             android:title="Dịch đoạn văn" />
+        <item
+            android:id="@+id/quiz"
+            android:icon="@drawable/ic_quiz"
+            android:title="Quiz" />
     </group>
 </menu>

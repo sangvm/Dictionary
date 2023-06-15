@@ -26,17 +26,27 @@ public class DBHelper extends SQLiteOpenHelper {
     private Context mContext;
 
     private static final int LIMIT_SEARCH = 12;
-    public static final String DATABASE_NAME = "Dictionary.db";
-    public static final int DATABASE_VERSION = 7;
+//    public static final String DATABASE_NAME = "Dictionary.db";
+    public static final String DATABASE_NAME = "dictionary.db";
+    public static final int DATABASE_VERSION = 8;
     private static final String SP_KEY_DB_VER = "db_ver";
     private String DATABASE_LOCATION = "";
     private String DATABASE_FULL_PATH = "";
 
     public SQLiteDatabase mDB;
 
-    private final String en_en = "en_en";
+    private final String vn_en = "va";
 
-    private final String vn_en = "vn_en";
+    private final String en_vn = "av";
+    private final String fr_vn = "pv";
+    private final String vn_fr = "vp";
+//    private final String vn_en = "va";
+
+    private final String COL_ID = "id";
+    private final String COL_WORD = "word";
+    private final String COL_HTML = "html";
+    private final String COL_PRONOUNCE = "pronounce";
+    private final String COL_DESCRIPTION = "description";
 
     private final String COL_KEY = "word";
     private final String COL_VALUE = "definition";
@@ -166,6 +176,19 @@ public class DBHelper extends SQLiteOpenHelper {
 
     }
 
+//    @SuppressLint("Range")
+//    public ArrayList<String> getWord(String dictionaryType) {
+//        String tableName = getTableName(dictionaryType);
+//        String query = "SELECT * FROM " + tableName;
+//        Cursor result = mDB.rawQuery(query, null);
+//
+//        ArrayList<String> source = new ArrayList<>();
+//        while (result.moveToNext()) {
+//            source.add(result.getString(result.getColumnIndex(COL_KEY)));
+//        }
+//        return source;
+//    }
+
     @SuppressLint("Range")
     public ArrayList<String> getWord(String dictionaryType) {
         String tableName = getTableName(dictionaryType);
@@ -174,23 +197,41 @@ public class DBHelper extends SQLiteOpenHelper {
 
         ArrayList<String> source = new ArrayList<>();
         while (result.moveToNext()) {
-            source.add(result.getString(result.getColumnIndex(COL_KEY)));
+            source.add(result.getString(result.getColumnIndex(COL_WORD)));
         }
         return source;
     }
+
+//    @SuppressLint("Range")
+//    public Word getWord(String key, String dictionaryType) {
+//        String tableName = getTableName(dictionaryType);
+//        String searchText = key;
+//        if (tableName == en_en) searchText = convertWordForm(searchText);
+//        String query = "SELECT * FROM " + tableName + " WHERE [word]= ?";
+//        Cursor result = mDB.rawQuery(query, new String[] {searchText});
+//
+//        Word word = new Word();
+//        while (result.moveToNext()) {
+//            word.key = result.getString(result.getColumnIndex(COL_KEY));
+//            word.value += result.getString(result.getColumnIndex(COL_VALUE));
+//        }
+//        return word;
+//    }
 
     @SuppressLint("Range")
     public Word getWord(String key, String dictionaryType) {
         String tableName = getTableName(dictionaryType);
         String searchText = key;
-        if (tableName == en_en) searchText = convertWordForm(searchText);
         String query = "SELECT * FROM " + tableName + " WHERE [word]= ?";
         Cursor result = mDB.rawQuery(query, new String[] {searchText});
 
         Word word = new Word();
         while (result.moveToNext()) {
-            word.key = result.getString(result.getColumnIndex(COL_KEY));
-            word.value += result.getString(result.getColumnIndex(COL_VALUE));
+            word.word = result.getString(result.getColumnIndex(COL_WORD));
+            word.html = result.getString(result.getColumnIndex(COL_HTML));
+            word.id = result.getInt(result.getColumnIndex(COL_ID));
+            word.description = result.getString(result.getColumnIndex(COL_DESCRIPTION));
+            word.pronounce = result.getString(result.getColumnIndex(COL_PRONOUNCE));
         }
         return word;
     }
@@ -213,14 +254,14 @@ public class DBHelper extends SQLiteOpenHelper {
 
     public boolean isWordMark(Word word) {
         String query = "SELECT * FROM bookmark WHERE word =? AND definition = ?";
-        Cursor result = mDB.rawQuery(query, new String[] {word.key, word.value});
+        Cursor result = mDB.rawQuery(query, new String[] {word.word, word.description});
         return result.getCount() > 0;
     }
 
     public void addBookmark(Word word) {
         try {
             String query = "INSERT INTO bookmark (word, definition, last_update) VALUES (?, ?, strftime('%Y-%m-%d %H:%M:%S', datetime('now')));";
-            mDB.execSQL(query, new Object[] {word.key, word.value});
+            mDB.execSQL(query, new Object[] {word.word, word.description});
         }
         catch (Exception e) {
 
@@ -230,7 +271,7 @@ public class DBHelper extends SQLiteOpenHelper {
     public void deleteBookmark(Word word) {
         try {
             String query = "DELETE FROM bookmark WHERE word = ?";
-            mDB.execSQL(query, new String[] {word.key});
+            mDB.execSQL(query, new String[] {word.word});
         }
         catch (Exception e) {
 
@@ -238,19 +279,27 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     public String convertWordForm(String str) {
-        String result = str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+        String result = str.toLowerCase();
         return result;
     }
 
     public String getTableName (String dicType) {
         String tableName = "";
-        if(Objects.equals(dicType, en_en)) {
-            tableName = en_en;
+        if(Objects.equals(dicType, "en_vn")) {
+            tableName = en_vn;
         }
-        if(Objects.equals(dicType, vn_en)) {
+        if(Objects.equals(dicType, "vn_en")) {
             tableName = vn_en;
         }
-        System.out.println("table name" + tableName);
+        if(Objects.equals(dicType, "fr_vn")) {
+            tableName = fr_vn;
+        }
+        if(Objects.equals(dicType, "vn_fr")) {
+            tableName = vn_fr;
+        }
+        if(Objects.equals(dicType, null)) {
+            tableName = en_vn;
+        }
         return tableName;
     }
 
@@ -258,20 +307,28 @@ public class DBHelper extends SQLiteOpenHelper {
     public ArrayList<String> getWordFromHistory(String dictionaryType) {
         String tableName = "";
         if (Objects.isNull(dictionaryType)) {
-            tableName = "history_en_en";
+            tableName = "history_en_vn";
         }
         else {
             switch (dictionaryType) {
-                case "en_en": {
-                    tableName = "history_en_en";
-                    break;
-                }
                 case "vn_en": {
                     tableName = "history_vn_en";
                     break;
                 }
+                case "en_vn": {
+                    tableName = "history_en_vn";
+                    break;
+                }
+                case "fr_vn": {
+                    tableName = "history_fr_vn";
+                    break;
+                }
+                case "vn_fr": {
+                    tableName = "history_vn_fr";
+                    break;
+                }
                 default: {
-                    tableName = "history_en_en";
+                    tableName = "history_en_vn";
                     break;
                 }
             }
@@ -294,25 +351,33 @@ public class DBHelper extends SQLiteOpenHelper {
     public void updateWordToHistory(Word word, String dictionaryType) {
         String tableName = "";
         if (Objects.isNull(dictionaryType)) {
-            tableName = "history_en_en";
+            tableName = "history_en_vn";
         }
         else {
             switch (dictionaryType) {
-                case "en_en": {
-                    tableName = "history_en_en";
-                    break;
-                }
                 case "vn_en": {
                     tableName = "history_vn_en";
                     break;
                 }
+                case "en_vn": {
+                    tableName = "history_en_vn";
+                    break;
+                }
+                case "fr_vn": {
+                    tableName = "history_fr_vn";
+                    break;
+                }
+                case "vn_fr": {
+                    tableName = "history_vn_fr";
+                    break;
+                }
                 default: {
-                    tableName = "history_en_en";
+                    tableName = "history_en_vn";
                     break;
                 }
             }
         }
         String query = "INSERT OR REPLACE INTO " + tableName + " (word, definition, last_update) VALUES (?, ?, strftime('%Y-%m-%d %H:%M:%S', datetime('now')))";
-        mDB.execSQL(query, new Object[] {word.key, word.value});
+        mDB.execSQL(query, new Object[] {word.word, word.description});
     }
 }

@@ -18,11 +18,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.dictionary.model.Word;
-import com.example.dictionary.ui.home.HomeFragment;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
-import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -42,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private EditText editText;
     private String dicType;
     private ActivityMainBinding binding;
+    private TextView historyTextView;
 
     MenuItem menuSetting;
     ArrayList<String> searchHistoryList = new ArrayList<>();
@@ -67,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        historyTextView = findViewById(R.id.textview_search_history);
 
         MenuItem bookmarkItem = navigationView.getMenu().findItem(R.id.nav_bookmark);
         bookmarkItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
 
-        dbHelper = new DBHelper(this);
+         dbHelper = new DBHelper(this);
 
         editText = findViewById(R.id.search_text);
 
@@ -102,20 +102,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Toast.makeText(getApplicationContext(), "Không tìm thấy từ cần tìm!", Toast.LENGTH_SHORT).show();
                         return false;
                     }
-                    Word word = dbHelper.getWord(searchResult, dicType);
-                    if (word.value.isEmpty()) {
+                    try {
+                        Word word = dbHelper.getWord(searchResult, dicType);
+                        if (word.description.isEmpty()) {
+                            Toast.makeText(getApplicationContext(), "Không tìm thấy từ cần tìm!", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                        else {
+                            Intent intent = new Intent(MainActivity.this, DetailActivity.class);;
+                            intent.putExtra("search_text", searchResult);
+                            intent.putExtra("dic_type", dicType);
+
+                            startActivity(intent);
+                            return true;
+                        }
+                    }
+                    catch (Exception e) {
                         Toast.makeText(getApplicationContext(), "Không tìm thấy từ cần tìm!", Toast.LENGTH_SHORT).show();
                         return false;
                     }
-                    else {
-                        Intent intent = new Intent(MainActivity.this, DetailActivity.class);;
-                        intent.putExtra("search_text", searchResult);
-                        intent.putExtra("dic_type", dicType);
-
-                        startActivity(intent);
-                        return true;
-                    }
-
                 }
                 return false;
             }
@@ -164,19 +169,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (!String.valueOf(id).equals("")) {
                 Global.saveState(this, "dic_type", String.valueOf(id));
             }
-
-            if (id == R.id.action_en_en) {
-                dicType = "en_en";
-                menuSetting.setIcon(getDrawable(R.drawable.ic_en_en));
+            if (id == R.id.action_en_vn) {
+                dicType = "en_vn";
+                historyTextView.setText("Từ điển Anh-Việt");
             }
             if (id == R.id.action_vn_en) {
                 dicType = "vn_en";
-                menuSetting.setIcon(getDrawable(R.drawable.ic_vn_en));
+                historyTextView.setText("Từ điển Việt-Anh");
+            }
+            if (id == R.id.action_fr_vn) {
+                dicType = "fr_vn";
+                historyTextView.setText("Từ điển Pháp-Việt");
+            }
+            if (id == R.id.action_vn_fr) {
+                dicType = "vn_fr";
+                historyTextView.setText("Từ điển Việt-Pháp");
             }
         }
         catch (Exception ex) {
-            dicType = "en_en";
-            menuSetting.setIcon(getDrawable(R.drawable.ic_en_en));
+            dicType = "en_vn";
+            historyTextView.setText("Từ điển Anh-Viêt");
         }
         finally {
             searchHistoryList = dbHelper.getWordFromHistory(dicType);
