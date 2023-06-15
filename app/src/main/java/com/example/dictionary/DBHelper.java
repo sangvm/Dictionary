@@ -26,9 +26,9 @@ public class DBHelper extends SQLiteOpenHelper {
     private Context mContext;
 
     private static final int LIMIT_SEARCH = 12;
-//    public static final String DATABASE_NAME = "Dictionary.db";
+    //    public static final String DATABASE_NAME = "Dictionary.db";
     public static final String DATABASE_NAME = "dictionary.db";
-    public static final int DATABASE_VERSION = 8;
+    public static final int DATABASE_VERSION = 10;
     private static final String SP_KEY_DB_VER = "db_ver";
     private String DATABASE_LOCATION = "";
     private String DATABASE_FULL_PATH = "";
@@ -36,20 +36,20 @@ public class DBHelper extends SQLiteOpenHelper {
     public SQLiteDatabase mDB;
 
     private final String vn_en = "va";
-
     private final String en_vn = "av";
     private final String fr_vn = "pv";
     private final String vn_fr = "vp";
-//    private final String vn_en = "va";
+    private final String ge_vn = "dv";
+    private final String vn_ge = "vd";
+    private final String ru_vn = "nv";
+    private final String vn_vn = "vv";
 
     private final String COL_ID = "id";
     private final String COL_WORD = "word";
     private final String COL_HTML = "html";
     private final String COL_PRONOUNCE = "pronounce";
     private final String COL_DESCRIPTION = "description";
-
-    private final String COL_KEY = "word";
-    private final String COL_VALUE = "definition";
+    private final String COL_DEFINITION = "definition";
 
     public DBHelper (Context context) {
 //        super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -243,9 +243,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
         ArrayList<String> source = new ArrayList<>();
         while (result.moveToNext()) {
-            String data = result.getString(result.getColumnIndex(COL_KEY));
+            String data = result.getString(result.getColumnIndex(COL_WORD));
             data += "\n";
-            String value = result.getString(result.getColumnIndex(COL_VALUE));
+            String value = result.getString(result.getColumnIndex(COL_DEFINITION));
             data += value.substring(0, Math.min(46, value.length())) + "...";
             source.add(data);
         }
@@ -297,7 +297,22 @@ public class DBHelper extends SQLiteOpenHelper {
         if(Objects.equals(dicType, "vn_fr")) {
             tableName = vn_fr;
         }
+        if(Objects.equals(dicType, "ge_vn")) {
+            tableName = ge_vn;
+        }
+        if(Objects.equals(dicType, "vn_ge")) {
+            tableName = vn_ge;
+        }
+        if(Objects.equals(dicType, "ru_vn")) {
+            tableName = ru_vn;
+        }
+        if(Objects.equals(dicType, "vn_vn")) {
+            tableName = vn_vn;
+        }
         if(Objects.equals(dicType, null)) {
+            tableName = en_vn;
+        }
+        if(Objects.equals(tableName, "")) {
             tableName = en_vn;
         }
         return tableName;
@@ -327,6 +342,22 @@ public class DBHelper extends SQLiteOpenHelper {
                     tableName = "history_vn_fr";
                     break;
                 }
+                case "ge_vn": {
+                    tableName = "history_ge_vn";
+                    break;
+                }
+                case "vn_ge": {
+                    tableName = "history_vn_ge";
+                    break;
+                }
+                case "ru_vn": {
+                    tableName = "history_ru_vn";
+                    break;
+                }
+                case "vn_vn": {
+                    tableName = "history_vn_vn";
+                    break;
+                }
                 default: {
                     tableName = "history_en_vn";
                     break;
@@ -339,9 +370,9 @@ public class DBHelper extends SQLiteOpenHelper {
 
         ArrayList<String> source = new ArrayList<>();
         while (result.moveToNext()) {
-            String data = result.getString(result.getColumnIndex(COL_KEY));
+            String data = result.getString(result.getColumnIndex(COL_WORD));
             data += "\n";
-            String value = result.getString(result.getColumnIndex(COL_VALUE));
+            String value = result.getString(result.getColumnIndex(COL_DEFINITION));
             data += value.substring(0, Math.min(46, value.length())) + "...";
             source.add(data);
         }
@@ -369,6 +400,22 @@ public class DBHelper extends SQLiteOpenHelper {
                 }
                 case "vn_fr": {
                     tableName = "history_vn_fr";
+                    break;
+                }
+                case "ge_vn": {
+                    tableName = "history_ge_vn";
+                    break;
+                }
+                case "vn_ge": {
+                    tableName = "history_vn_ge";
+                    break;
+                }
+                case "ru_vn": {
+                    tableName = "history_ru_vn";
+                    break;
+                }
+                case "vn_vn": {
+                    tableName = "history_vn_vn";
                     break;
                 }
                 default: {

@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String dicType;
     private ActivityMainBinding binding;
     private TextView historyTextView;
+    private TextView noHistorySearch;
 
     MenuItem menuSetting;
     ArrayList<String> searchHistoryList = new ArrayList<>();
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationUI.setupWithNavController(navigationView, navController);
 
         historyTextView = findViewById(R.id.textview_search_history);
+        noHistorySearch = findViewById(R.id.textview_home_notification);
 
         MenuItem bookmarkItem = navigationView.getMenu().findItem(R.id.nav_bookmark);
         bookmarkItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
@@ -89,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
 
-         dbHelper = new DBHelper(this);
+        dbHelper = new DBHelper(this);
 
         editText = findViewById(R.id.search_text);
 
@@ -130,6 +132,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ListView searchHistoryView = findViewById(R.id.search_history_list);
         HomeAdapter adapter = new HomeAdapter(this, searchHistoryList);
         searchHistoryView.setAdapter(adapter);
+        if(searchHistoryList.size() != 0) {
+            noHistorySearch.setVisibility(View.GONE);
+        }
+        else {
+            noHistorySearch.setVisibility(View.VISIBLE);
+        }
         searchHistoryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -137,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String word = selectedWord.substring(0, selectedWord.indexOf("\n"));
                 Intent intent = new Intent(MainActivity.this, DetailActivity.class);
                 intent.putExtra("search_text", word);
+                intent.putExtra("dic_type", dicType);
                 startActivity(intent);
             }
         });
@@ -148,11 +157,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getMenuInflater().inflate(R.menu.main, menu);
         menuSetting = menu.findItem(R.id.action_setting);
 
-       String id = Global.getState(this, "dic_type");
-       if (id != null) {
-           onOptionsItemSelected(menu.findItem(Integer.valueOf(id)));
-       }
-       return true;
+        String id = Global.getState(this, "dic_type");
+        if (id != null) {
+            onOptionsItemSelected(menu.findItem(Integer.valueOf(id)));
+        }
+        return true;
     }
 
     @Override
@@ -185,6 +194,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dicType = "vn_fr";
                 historyTextView.setText("Từ điển Việt-Pháp");
             }
+            if (id == R.id.action_ge_vn) {
+                dicType = "ge_vn";
+                historyTextView.setText("Từ điển Đức-Việt");
+            }
+            if (id == R.id.action_vn_ge) {
+                dicType = "vn_ge";
+                historyTextView.setText("Từ điển Việt-Đức");
+            }
+            if (id == R.id.action_ru_vn) {
+                dicType = "ru_vn";
+                historyTextView.setText("Từ điển Nga-Việt");
+            }
+            if (id == R.id.action_vn_vn) {
+                dicType = "vn_vn";
+                historyTextView.setText("Từ điển Việt-Việt");
+            }
         }
         catch (Exception ex) {
             dicType = "en_vn";
@@ -195,6 +220,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ListView searchHistoryView = findViewById(R.id.search_history_list);
             HomeAdapter adapter = new HomeAdapter(this, searchHistoryList);
             searchHistoryView.setAdapter(adapter);
+            if(searchHistoryList.size() != 0) {
+                noHistorySearch.setVisibility(View.GONE);
+            }
+            else {
+                noHistorySearch.setVisibility(View.VISIBLE);
+            }
         }
         return super.onOptionsItemSelected(item);
     }
