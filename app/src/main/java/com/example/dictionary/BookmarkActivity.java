@@ -46,16 +46,6 @@ public class BookmarkActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        Button button = findViewById(R.id.start_quizz);
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(BookmarkActivity.this, QuizzActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 }
 

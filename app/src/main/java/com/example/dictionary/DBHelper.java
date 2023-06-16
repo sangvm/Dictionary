@@ -237,6 +237,24 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
+    public Word getWordById(int id, String dictionaryType) {
+        String tableName = getTableName(dictionaryType);
+        int index = id;
+        String query = "SELECT * FROM " + tableName + " WHERE id = " + index;
+        Cursor result = mDB.rawQuery(query , null);
+
+        Word word = new Word();
+        while (result.moveToNext()) {
+            word.word = result.getString(result.getColumnIndex(COL_WORD));
+            word.html = result.getString(result.getColumnIndex(COL_HTML));
+            word.id = result.getInt(result.getColumnIndex(COL_ID));
+            word.description = result.getString(result.getColumnIndex(COL_DESCRIPTION));
+            word.pronounce = result.getString(result.getColumnIndex(COL_PRONOUNCE));
+        }
+        return word;
+    }
+
+    @SuppressLint("Range")
     public ArrayList<String> getWordFromBookmark() {
         String query = "SELECT * FROM bookmark ORDER BY last_update DESC";
         Cursor result = mDB.rawQuery(query, null);

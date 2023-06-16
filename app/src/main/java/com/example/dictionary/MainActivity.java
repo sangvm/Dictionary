@@ -90,6 +90,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        MenuItem quizItem = navigationView.getMenu().findItem(R.id.nav_quiz);
+        quizItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(MainActivity.this, QuizIntroActivity.class);
+                startActivity(intent);
+                return false;
+            }
+        });
 
         dbHelper = new DBHelper(this);
 
