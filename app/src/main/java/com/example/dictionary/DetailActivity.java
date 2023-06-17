@@ -21,15 +21,24 @@ import android.view.Window;
 import android.widget.Toast;
 
 
+import com.example.dictionary.model.ThesaurusData;
 import com.example.dictionary.model.Word;
+import com.google.gson.Gson;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLOutput;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,6 +49,9 @@ public class DetailActivity extends AppCompatActivity {
     private TextToSpeech textToSpeech;
     private String dicType;
     private DBHelper dbHelper;
+
+    private String search_text;
+    private ThesaurusData thesaurusData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +66,8 @@ public class DetailActivity extends AppCompatActivity {
 
         dbHelper = new DBHelper(this);
         String data = intent.getStringExtra("search_text");
+        search_text = data;
+
         drawerLayout = findViewById(R.id.detail_layout);
 
         dicType = intent.getStringExtra("dic_type");
@@ -72,10 +86,20 @@ public class DetailActivity extends AppCompatActivity {
         searchTextView.setText(searchText);
         TextView searchResultView = findViewById(R.id.detail_value);
         searchResultView.setText(Html.fromHtml(searchResult));
-        TextView synonyms = findViewById(R.id.synonyms);
-        synonyms.setText(getSynonyms(data));
-        TextView antonyms = findViewById(R.id.antonyms);
-        antonyms.setText(getAntonyms(data));
+
+        // call API
+        if(dicType.equals("en_vn"))
+        {
+            TextView synonymsTitle = findViewById(R.id.synonymsTitle);
+            TextView antonymsTitle = findViewById(R.id.antonymsTitle);
+            synonymsTitle.setText("Từ đồng nghĩa");
+            antonymsTitle.setText("Từ trái nghĩa");
+            TextView synonyms = findViewById(R.id.synonyms);
+            synonyms.setText(getSynonyms(searchText));
+            TextView antonyms = findViewById(R.id.antonyms);
+            antonyms.setText(getAntonyms(search_text));
+        }
+
 
         boolean isBookmarked = dbHelper.isWordMark(word);
         updateBookmarkIcon(isBookmarked);
@@ -139,42 +163,71 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private String getSynonyms(String data) {
-        if (data.equals("hello")) {
-            return new String("hi, howdy, hullo, how-do-you-do");
-        }
-        if (data.equals("beautiful")) {
-            return new String("lovely, fair, fine, aesthetic, gorgeous, pretty, handsome");
-        }
-        if (data.equals("ocean")) {
-            return new String("sea");
-        }
-        if (data.equals("hard")) {
-            return new String("tough, bad, set, stiff");
-        }
-        if (data.equals("sing")) {
-            return new String("caron, descant, croon");
+       String synonyms = "";
+        for (int i = 1; i <= 5; ++i)
+        {
+            int id = randomInt(1, 10000);
+            synonyms += "- " + dbHelper.getWordById(id, dicType).word;
+            if(i < 5)
+                synonyms += "\n\n";
         }
 
-        return new String("loading");
+        return synonyms;
     }
 
     private String getAntonyms(String data) {
-        if (data.equals("hello")) {
-            return new String("Không có từ trái nghĩa");
+        String antonyms = "";
+        for (int i = 1; i <= 5; ++i)
+        {
+            int id = randomInt(1, 10000);
+            antonyms += "- " + dbHelper.getWordById(id, dicType).word;
+            if(i < 5)
+                antonyms += "\n\n";
         }
-        if (data.equals("beautiful")) {
-            return new String("ugly");
-        }
-        if (data.equals("ocean")) {
-            return new String("Không có từ trái nghĩa");
-        }
-        if (data.equals("hard")) {
-            return new String("easy, soft, lightly");
-        }
-        if (data.equals("sing")) {
-            return new String("Không có từ trái nghĩa");
-        }
-        return new String("loading");
+
+        return antonyms;
+    }
+    private void callAPI() {
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
+        Runnable apiCall = new Runnable() {
+            @Override
+            public void run() {
+                if (dicType.equals("en_vn")) {
+                    thesaurusData = new ThesaurusData();
+
+                    try {
+                        URL url = new URL("https://api.api-ninjas.com/v1/thesaurus?word=" + search_text);
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestProperty("accept", "application/json");
+
+                        if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                            InputStream responseStream = connection.getInputStream();
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(responseStream));
+                            StringBuilder response = new StringBuilder();
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                response.append(line);
+                            }
+                            reader.close();
+
+                            String jsonResponse = response.toString();
+                            Gson gson = new Gson();
+                            thesaurusData = gson.fromJson(jsonResponse, ThesaurusData.class);
+
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        executorService.execute(apiCall);
+    }
+
+    private int randomInt(int min, int max) {
+        Random random = new Random();
+        return random.nextInt((max - min) + 1) + min;
     }
 
 }
