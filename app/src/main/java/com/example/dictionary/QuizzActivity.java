@@ -157,14 +157,14 @@ public class QuizzActivity extends AppCompatActivity {
                 D.setText(String.format("D. %s",answerList.get(id3).description));
                 break;
             case 2:
-                question.setText(String.format("Câu %d: Đâu là cách phát âm của từ \n\n %s \n\n ", curQuestion+1, wordList.get(curQuestion).word));
-                A.setText(String.format("A. %s",wordList.get(curQuestion).pronounce));
-                B.setText(String.format("B. %s",answerList.get(id1).pronounce));
-                C.setText(String.format("C. %s",answerList.get(id2).pronounce));
-                D.setText(String.format("D. %s",answerList.get(id3).pronounce));
+                question.setText(String.format("Câu %d: Đâu là phiên âm của từ \n\n %s \n\n ", curQuestion+1, wordList.get(curQuestion).word));
+                A.setText(String.format("A. /%s/",wordList.get(curQuestion).pronounce));
+                B.setText(String.format("B. /%s/",answerList.get(id1).pronounce));
+                C.setText(String.format("C. /%s/",answerList.get(id2).pronounce));
+                D.setText(String.format("D. /%s/",answerList.get(id3).pronounce));
                 break;
             case 3:
-                question.setText(String.format("Câu %d: Từ nào có cách phát âm như sau \n\n %s \n\n ", curQuestion+1, wordList.get(curQuestion).pronounce));
+                question.setText(String.format("Câu %d: Từ nào có phiên âm như sau \n\n /%s/ \n\n ", curQuestion+1, wordList.get(curQuestion).pronounce));
                 A.setText(String.format("A. %s",wordList.get(curQuestion).word));
                 B.setText(String.format("B. %s",answerList.get(id1).word));
                 C.setText(String.format("C. %s",answerList.get(id2).word));
