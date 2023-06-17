@@ -16,12 +16,13 @@ import android.widget.ListView;
 import com.example.dictionary.model.Word;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class BookmarkActivity extends AppCompatActivity {
 
     private DBHelper dbHelper;
-
+    ArrayList<String> dicTypeList = new ArrayList<String>(Arrays.asList("ru_vn",  "fr_vn", "vn_fr", "ge_vn", "vn_ge",  "vn_vn", "en_vn", "vn_en"));
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,8 +42,24 @@ public class BookmarkActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedWord = (String) parent.getItemAtPosition(position);
                 String word = selectedWord.substring(0, selectedWord.indexOf("\n"));
+                String description = "";
+                int index = selectedWord.indexOf("\n");
+                if (index != -1) {
+                    description = selectedWord.substring(index + 1);
+                    description = description.replaceAll("\\\\n|\\.\\.\\.", "");
+                }
+                String dicType = "en_vn";
+                for (int i = 0; i < dicTypeList.size(); i++) {
+                    String currentDicType = dicTypeList.get(i);
+                    boolean ok = dbHelper.getWordFromBookmark(word, description, currentDicType);
+                    if (ok) {
+                        dicType = currentDicType;
+                        break;
+                    }
+                }
                 Intent intent = new Intent(BookmarkActivity.this, DetailActivity.class);
                 intent.putExtra("search_text", word);
+                intent.putExtra("dic_type", dicType);
                 startActivity(intent);
             }
         });

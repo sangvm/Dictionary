@@ -237,6 +237,25 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     @SuppressLint("Range")
+    public boolean getWordFromBookmark(String key, String description, String dictionaryType) {
+        String tableName = getTableName(dictionaryType);
+        String searchText = key;
+        String query = "SELECT * FROM " + tableName + " WHERE [word]= ? AND [description] LIKE ?";
+        Cursor result = mDB.rawQuery(query, new String[] {searchText, "%" + description + "%"});
+
+        Word word = new Word();
+        while (result.moveToNext()) {
+            word.word = result.getString(result.getColumnIndex(COL_WORD));
+            word.html = result.getString(result.getColumnIndex(COL_HTML));
+            word.id = result.getInt(result.getColumnIndex(COL_ID));
+            word.description = result.getString(result.getColumnIndex(COL_DESCRIPTION));
+            word.pronounce = result.getString(result.getColumnIndex(COL_PRONOUNCE));
+        }
+        if(result.moveToFirst()) return true;
+        return false;
+    }
+
+    @SuppressLint("Range")
     public Word getWordById(int id, String dictionaryType) {
         String tableName = getTableName(dictionaryType);
         int index = id;

@@ -23,7 +23,7 @@ public class QuizzActivity extends AppCompatActivity {
     ArrayList<Word> wordList = new ArrayList<>();
     ArrayList<Word> answerList = new ArrayList<>();
 
-    ArrayList<Word> wrongList = new ArrayList<>();
+    ArrayList<String> wrongList = new ArrayList<>();
 
     int numRight= 0;
     private TextView A, B, C, D, question;
@@ -118,8 +118,8 @@ public class QuizzActivity extends AppCompatActivity {
                     if (right) {
                         numRight++;
                     } else {
-//                        int save = curQuestion;
-//                        wrongList.add(wordList.get(save));
+                        int save = curQuestion;
+                        wrongList.add(wordList.get(save).word);
                     }
                     right = false;
                     curQuestion++;
