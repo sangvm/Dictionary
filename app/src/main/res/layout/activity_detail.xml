@@ -82,7 +82,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="18dp"
-                android:paddingLeft="20dp" />
+                android:paddingLeft="20dp"
+                android:textSize="18sp"/>
 
             <TextView
                 android:id="@+id/antonymsTitle"
@@ -98,7 +99,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="18dp"
-                android:paddingLeft="20dp" />
+                android:paddingLeft="20dp"
+                android:textSize="18sp"/>
 
 
         </LinearLayout>

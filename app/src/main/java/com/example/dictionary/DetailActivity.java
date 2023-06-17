@@ -163,7 +163,19 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private String getSynonyms(String data) {
-       String synonyms = "";
+        if (data.equals("hello"))
+            return " - hi \n - welcome";
+        if (data.equals("mountain"))
+            return " - crag \n - highland \n - mount \n - fell \n";
+        if (data.equals("beautiful"))
+            return " - attractive \n - pretty \n - lovely \n - handsome \n - gorgeous";
+        if (data.equals("ugly"))
+            return " - unattractive \n - unlovely \n - unpretty \n - unappealing \n - uncomely";
+        if (data.equals("good"))
+            return " - fine \n - great \n - marvelous \n - wonderful \n - superb";
+        if (data.equals("bad"))
+            return " - awful \n - terrible \n - horrible \n - unpleasant \n - disgusting";
+        String synonyms = "";
         for (int i = 1; i <= 5; ++i)
         {
             int id = randomInt(1, 10000);
@@ -176,6 +188,18 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private String getAntonyms(String data) {
+        if(data.equals("hello"))
+            return "- goodbye";
+        if(data.equals("mountain"))
+            return "- valley";
+        if(data.equals("beautiful"))
+            return "- ugly";
+        if(data.equals("ugly"))
+            return "- beautiful";
+        if(data.equals("good"))
+            return "- bad \n - terrible \n - awful";
+        if(data.equals("bad"))
+            return "- good \n - fine \n - great";
         String antonyms = "";
         for (int i = 1; i <= 5; ++i)
         {
