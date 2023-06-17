@@ -1,20 +1,26 @@
 package com.example.dictionary;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.dictionary.model.Word;
-import com.example.dictionary.ui.home.HomeFragment;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
-import androidx.core.view.GravityCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -24,12 +30,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.dictionary.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private AppBarConfiguration mAppBarConfiguration;
 
     private EditText editText;
+    private String dicType;
     private ActivityMainBinding binding;
+    private TextView historyTextView;
+    private TextView noHistorySearch;
+
+    MenuItem menuSetting;
+    ArrayList<String> searchHistoryList = new ArrayList<>();
 
     private DBHelper dbHelper;
 
@@ -52,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
 
+        historyTextView = findViewById(R.id.textview_search_history);
+        noHistorySearch = findViewById(R.id.textview_home_notification);
+
         MenuItem bookmarkItem = navigationView.getMenu().findItem(R.id.nav_bookmark);
         bookmarkItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -72,6 +90,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        MenuItem quizItem = navigationView.getMenu().findItem(R.id.nav_quiz);
+        quizItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Intent intent = new Intent(MainActivity.this, QuizIntroActivity.class);
+                startActivity(intent);
+                return false;
+            }
+        });
 
         dbHelper = new DBHelper(this);
 
@@ -82,15 +109,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
                     String searchResult = editText.getText().toString();
-                    if (searchResult.length() == 0) return false;
+                    if (searchResult.length() == 0) {
+                        Toast.makeText(getApplicationContext(), "Không tìm thấy từ cần tìm!", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
+                    try {
+                        Word word = dbHelper.getWord(searchResult, dicType);
+                        if (word.description.isEmpty()) {
+                            Toast.makeText(getApplicationContext(), "Không tìm thấy từ cần tìm!", Toast.LENGTH_SHORT).show();
+                            return false;
+                        }
+                        else {
+                            Intent intent = new Intent(MainActivity.this, DetailActivity.class);;
+                            intent.putExtra("search_text", searchResult);
+                            intent.putExtra("dic_type", dicType);
 
-                    Intent intent = new Intent(MainActivity.this, DetailActivity.class);;
-                    intent.putExtra("search_text", searchResult);
-
-                    startActivity(intent);
-                    return true;
+                            startActivity(intent);
+                            return true;
+                        }
+                    }
+                    catch (Exception e) {
+                        Toast.makeText(getApplicationContext(), "Không tìm thấy từ cần tìm!", Toast.LENGTH_SHORT).show();
+                        return false;
+                    }
                 }
                 return false;
+            }
+        });
+
+        searchHistoryList = dbHelper.getWordFromHistory(dicType);
+        ListView searchHistoryView = findViewById(R.id.search_history_list);
+        HomeAdapter adapter = new HomeAdapter(this, searchHistoryList);
+        searchHistoryView.setAdapter(adapter);
+        if(searchHistoryList.size() != 0) {
+            noHistorySearch.setVisibility(View.GONE);
+        }
+        else {
+            noHistorySearch.setVisibility(View.VISIBLE);
+        }
+        searchHistoryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedWord = (String) parent.getItemAtPosition(position);
+                String word = selectedWord.substring(0, selectedWord.indexOf("\n"));
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+                intent.putExtra("search_text", word);
+                intent.putExtra("dic_type", dicType);
+                startActivity(intent);
             }
         });
     }
@@ -99,6 +164,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+        menuSetting = menu.findItem(R.id.action_setting);
+
+        String id = Global.getState(this, "dic_type");
+        if (id != null) {
+            onOptionsItemSelected(menu.findItem(Integer.valueOf(id)));
+        }
         return true;
     }
 
@@ -110,7 +181,82 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        try {
+            int id = item.getItemId();
+            if (!String.valueOf(id).equals("")) {
+                Global.saveState(this, "dic_type", String.valueOf(id));
+            }
+            if (id == R.id.action_en_vn) {
+                dicType = "en_vn";
+                historyTextView.setText("Từ điển Anh-Việt");
+            }
+            if (id == R.id.action_vn_en) {
+                dicType = "vn_en";
+                historyTextView.setText("Từ điển Việt-Anh");
+            }
+            if (id == R.id.action_fr_vn) {
+                dicType = "fr_vn";
+                historyTextView.setText("Từ điển Pháp-Việt");
+            }
+            if (id == R.id.action_vn_fr) {
+                dicType = "vn_fr";
+                historyTextView.setText("Từ điển Việt-Pháp");
+            }
+            if (id == R.id.action_ge_vn) {
+                dicType = "ge_vn";
+                historyTextView.setText("Từ điển Đức-Việt");
+            }
+            if (id == R.id.action_vn_ge) {
+                dicType = "vn_ge";
+                historyTextView.setText("Từ điển Việt-Đức");
+            }
+            if (id == R.id.action_ru_vn) {
+                dicType = "ru_vn";
+                historyTextView.setText("Từ điển Nga-Việt");
+            }
+            if (id == R.id.action_vn_vn) {
+                dicType = "vn_vn";
+                historyTextView.setText("Từ điển Việt-Việt");
+            }
+        }
+        catch (Exception ex) {
+            dicType = "en_vn";
+            historyTextView.setText("Từ điển Anh-Viêt");
+        }
+        finally {
+            searchHistoryList = dbHelper.getWordFromHistory(dicType);
+            ListView searchHistoryView = findViewById(R.id.search_history_list);
+            HomeAdapter adapter = new HomeAdapter(this, searchHistoryList);
+            searchHistoryView.setAdapter(adapter);
+            if(searchHistoryList.size() != 0) {
+                noHistorySearch.setVisibility(View.GONE);
+            }
+            else {
+                noHistorySearch.setVisibility(View.VISIBLE);
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return true;
+    }
+}
+
+class HomeAdapter extends ArrayAdapter<String> {
+    private final int[] colors = new int[] { Color.WHITE, Color.rgb(240, 240, 240) };
+
+    public HomeAdapter(Context context, List<String> bookmarks) {
+        super(context, android.R.layout.simple_list_item_1, bookmarks);
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View view = super.getView(position, convertView, parent);
+        int color = colors[position % colors.length];
+        view.setBackgroundColor(color);
+        return view;
     }
 }

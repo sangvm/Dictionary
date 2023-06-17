@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
+    <item
+        android:id="@+id/action_setting"
+        android:orderInCategory="100"
+        android:title=""
+        android:icon="@drawable/ic_translate"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/action_vn_en"
+                android:orderInCategory="100"
+                app:showAsAction="never"
+                android:title="VN-EN"></item>
+            <item
+                android:id="@+id/action_en_vn"
+                android:orderInCategory="100"
+                android:title="EN-VN"
+                app:showAsAction="never"></item>
+            <item
+                android:id="@+id/action_vn_fr"
+                android:orderInCategory="100"
+                app:showAsAction="never"
+                android:title="VN-FR"></item>
+            <item
+                android:id="@+id/action_fr_vn"
+                android:orderInCategory="100"
+                android:title="FR-VN"
+                app:showAsAction="never"></item>
+            <item
+                android:id="@+id/action_ge_vn"
+                android:orderInCategory="100"
+                android:title="GE-VN"
+                app:showAsAction="never"></item>
+            <item
+                android:id="@+id/action_vn_ge"
+                android:orderInCategory="100"
+                android:title="VN_GE"
+                app:showAsAction="never"></item>
+            <item
+                android:id="@+id/action_ru_vn"
+                android:orderInCategory="100"
+                android:title="RU-VN"
+                app:showAsAction="never"></item>
+            <item
+                android:id="@+id/action_vn_vn"
+                android:orderInCategory="100"
+                android:title="VN-VN"
+                app:showAsAction="never"></item>
+        </menu>
+    </item>
 </menu>
